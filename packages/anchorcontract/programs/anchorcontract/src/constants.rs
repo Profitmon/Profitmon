@@ -1,0 +1,1 @@
+pub const ADMIN_PUBKEY: &str = "YourAdminPubkeyHere"; // replace with real admin pubkey
