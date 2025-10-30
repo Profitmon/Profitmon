@@ -1,0 +1,167 @@
+// ------------------------
+// Datasource & Generator
+// ------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------
+// User model
+// ------------------------
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  username      String?
+  balance       Float    @default(0)
+  isAdmin       Boolean  @default(false)
+  lastHatchTime BigInt?
+
+  eggs       UserEgg[]
+  cards      UserCard[]
+  battlesAsPlayer1 Battle[] @relation("UserAsPlayer1")
+  battlesAsPlayer2 Battle[] @relation("UserAsPlayer2")
+  battlesWon Battle[] @relation("UserAsBattleWinner")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ------------------------
+// Card model
+// ------------------------
+model Card {
+  id       String      @id @default(cuid())
+  name     String
+  rarity   Rarity
+  elementType String
+  baseHp   Int
+  skills   Skill[]
+  imageUrl String
+  maxSupply     Int? // optional, for limited cards
+  currentSupply Int  @default(0)
+
+  userCards UserCard[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ------------------------
+// Skill model
+// ------------------------
+model Skill {
+  id     String @id @default(cuid())
+  cardId String
+  name   String
+  type   SkillType
+  power  Int
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+// ------------------------
+// UserCard model
+// ------------------------
+model UserCard {
+  id         String   @id @default(cuid())
+  instanceId String?  // unique per user's card (from Solana)
+  owner      String   // wallet address
+  cardId     String
+  metadata   String
+  currentHp  Int       // mutable HP for battles
+  isActive   Boolean   @default(false)
+  skills     Json      // if you’re storing array of skills
+
+  createdAt  DateTime  @default(now())
+}
+
+model UserCardMetadata {
+  id      String
+  imageUrl  String
+   name     String
+  rarity   Rarity
+  elementType String
+  baseHp   Int
+  skills   Skill[]
+  imageUrl String
+  maxSupply     Int? // optional, for limited cards
+  currentSupply Int  @default(0)
+}
+
+// ------------------------
+// UserEgg model
+// ------------------------
+model UserEgg {
+  id        String  @id @default(cuid())
+  wallet    String
+  imageUrl  String
+  type      EggType
+  isHatched Boolean @default(false)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// ------------------------
+// Battle model
+// ------------------------
+model Battle {
+  id String @id @default(cuid())
+
+  player1Id String
+  player2Id String?
+  winnerId  String?
+
+  player1CardId String?
+  player2CardId String?
+
+  betAmount      Float    @default(0)
+  player1Balance Float    @default(0)
+  player2Balance Float    @default(0)
+  isResolved     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  player1 User  @relation("UserAsPlayer1", fields: [player1Id], references: [id], onDelete: Cascade)
+  player2 User? @relation("UserAsPlayer2", fields: [player2Id], references: [id])
+  winner  User? @relation("UserAsBattleWinner", fields: [winnerId], references: [id])
+
+  player1Card UserCard? @relation("BattlePlayer1Card", fields: [player1CardId], references: [id])
+  player2Card UserCard? @relation("BattlePlayer2Card", fields: [player2CardId], references: [id])
+}
+
+// ------------------------
+// Enums
+// ------------------------
+enum Rarity {
+  COMMON
+  UNCOMMON
+  RARE
+  ULTRA_RARE
+  DOUBLE_RARE
+  ILLUSTRATION_RARE
+  HYPER_RARE
+}
+
+enum EggType {
+  BRONZE
+  SILVER
+  GOLD
+  CRYSTAL
+  MASTER
+  CHAMPION
+  TITAN
+  LEGEND_LEAGUE
+}
+
+enum SkillType {
+  attack
+  defense
+  heal
+  swap
+}

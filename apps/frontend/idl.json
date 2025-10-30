@@ -1,0 +1,26 @@
+{
+    "version": "0.1.0",
+    "name": "egg_hatch",
+    "instructions": [
+      {
+        "name": "hatchEgg",
+        "accounts": [
+          { "name": "egg", "isMut": true, "isSigner": false },
+          { "name": "owner", "isMut": true, "isSigner": true }
+        ],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "egg",
+        "type": {
+          "struct": [
+            { "name": "owner", "type": "publicKey" },
+            { "name": "isHatched", "type": "bool" }
+          ]
+        }
+      }
+    ]
+  }
+  

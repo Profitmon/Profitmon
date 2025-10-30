@@ -1,0 +1,26 @@
+{
+  "name": "apps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@repo/sharedtypes": "workspace:*",
+    "@types/axios": "^0.14.4",
+    "axios": "^1.13.1",
+    "ioredis": "^5.8.2",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.9.3"
+  }
+}
